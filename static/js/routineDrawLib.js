@@ -22,7 +22,6 @@ export function clearRoutineTable () {
 
 export function addTaskCell(key, day, start, end, name, colour) {
     let taskContainer = document.getElementById("routine-table").children[day].lastChild;
-    console.log(taskContainer)
     let startTime = timeToMin(start);
     let endTime = timeToMin(end);
     let duration = endTime - startTime;

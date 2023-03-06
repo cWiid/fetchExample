@@ -4,12 +4,12 @@ const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 let routineApp = document.getElementById("routine-app");
 
 function initTimeStampCol () {
-    let timestampCol = elemBuild("div", "col-1 sticky-left", "timestamp-col");
-    let timestampRow = elemBuild("div", "row timestamp-row sticky-left", "empty-timestamp-row");
+    let timestampCol = elemBuild("div", "col-2", "timestamp-col");
+    let timestampRow = elemBuild("div", "row sticky-top timestamp-row", "empty-timestamp-row");
     timestampCol.appendChild(timestampRow)
 
-    for (let i=1; i<24; i++) {
-        let timestampRow = elemBuild("div", "row timestamp-row sticky-left");
+    for (let i=0; i<24; i++) {
+        let timestampRow = elemBuild("div", "row timestamp-row");
         timestampRow.innerHTML = `${i.toString().padStart(2, '0')}:00`
         timestampCol.appendChild(timestampRow)
     }
@@ -19,7 +19,7 @@ function initTimeStampCol () {
 
 function initDayHeader(weekIndex) {
     let dayTitleDiv = elemBuild("div",
-        "col day-title sticky-top",
+        "col day-title border border-primary rounded row-xs center-block text-center sticky-top",
         (weekIndex+1).toString().toLowerCase().concat("-title"));
     dayTitleDiv.innerHTML = weekdays[weekIndex];
 
@@ -39,10 +39,10 @@ function initDayCol(weekIndex) {
         let cell = document.createElement("div");
         cell.setAttribute("id", timestampIdCode);
         if (i % 2 === 0) {
-            cell.setAttribute("class", "row cell light-cell");
+            cell.setAttribute("class", "row cell border-bottom light-cell");
         }
         else {
-            cell.setAttribute("class", "row cell dark-cell");
+            cell.setAttribute("class", "row cell border-bottom dark-cell");
         }
         // cell.innerHTML = timestampIdCode;
 

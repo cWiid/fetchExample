@@ -1,4 +1,5 @@
 .day-title {
+    padding: 0;
     text-align: center;
 }
 
@@ -7,13 +8,13 @@
 }
 
 .dark-cell {
-    background-color: lightgray;
+    background-color: #f5f5f5;
 }
 
 #table-sticky-top {
     width: 100%;
-    height: 60px;
-    background-color: lightskyblue;
+    height: 10vh;
+    background-color: white;
     z-index: 1000;
 }
 
@@ -23,15 +24,21 @@
 }
 
 .timestamp-col {
+    display:inline-block;
     position: relative;
+    white-space:nowrap;
 }
 
 .timestamp-row {
+    color: dimgrey;
     height: 60px;
 }
 
 .day-title {
     top: 3%;
+}
+
+.cells-div {
 }
 
 .day-col {
@@ -47,17 +54,19 @@
     width: 0;
     border-radius: 0 !important;
     display:inline-block;
-    color: white;
     outline: none;
+    color: white;
     position: relative;
-    z-index: 1000;
+    z-index: 10;
     text-overflow: ellipsis;
     overflow:hidden;
     white-space:nowrap;
 }
 
 #routine-app {
-    overflow-y: hidden;
+    height: 90vh;
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 
 #routine-table {
@@ -65,6 +74,48 @@
     width: 96rem;
 }
 
-.form-group {
-    margin: 1rem;
+.container {
+    vertical-align: top;
+}
+
+#timestamp-col {
+    position:sticky;
+    left: 0;
+    z-index: 100;
+}
+
+.day-title {
+    width:100%;
+    background-color: white;
+    z-index: 1000
+}
+
+.sticky-top {
+    padding: 1rem;
+}
+
+#empty-timestamp-row {
+    height: 4rem;
+    z-index: 900;
+    background-color: white;
+    width: 100vw;
+}
+
+.col-1 {
+    width: 1rem;
+}
+
+.col-2 {
+    width: 4rem;
+}
+
+.form-control {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.4rem;
+    margin-left: 0.4rem;
 }

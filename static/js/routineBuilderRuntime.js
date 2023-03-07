@@ -7,18 +7,18 @@ const orgDataObj = await apiCall("./get-org-data", "org-placeholder");
 
 // INITIAL PAGE LOAD
 const orgRoutines = orgDataObj["routines"];
-let currRoutineKey = 0;
+let currRoutineUid = 0;
 
 const routineSelector = document.getElementById("select-routine");
 
 function loadRoutinesIntoSelector () {
     for (let i=0; i<orgRoutines.length; i++) {
 
-        let routineKey = orgRoutines[i]["key"];
+        let routineUid = orgRoutines[i]["uid"];
         let routineName = orgRoutines[i]["name"];
 
         let routineOption = elemBuild("option", "routine-opt");
-        routineOption.setAttribute("value", routineKey);
+        routineOption.setAttribute("value", routineUid);
         routineOption.innerHTML = routineName;
 
         routineSelector.appendChild(routineOption);
@@ -38,11 +38,10 @@ function loadLocationsIntoModal() {
     let locationSelector = document.getElementById("location");
 
     for (let i=0; i<locations.length; i++) {
-        let keyVal = locations[i]["key"];
+        let uidVal = locations[i]["uid"];
         let nameVal = locations[i]["name"];
         let locationOption = elemBuild("option");
-        locationOption.setAttribute("data-keyval", keyVal);
-        locationOption.setAttribute("value", keyVal);
+        locationOption.setAttribute("value", uidVal);
         locationOption.innerHTML = nameVal;
 
         locationSelector.appendChild(locationOption);
@@ -56,7 +55,7 @@ function loadResourcesIntoModal (resource) {
 
     for (let i=0; i<resourceObj.length; i++) {
         let tdTagValue = ''
-        let keyVal = resourceObj[i]["key"];
+        let uidVal = resourceObj[i]["uid"];
         let idVal = resourceObj[i]["id"];
         let nameVal = resourceObj[i]["name"];
         let tagArr = resourceObj[i]["tags"];
@@ -67,7 +66,8 @@ function loadResourcesIntoModal (resource) {
         th.setAttribute("scope", "row");
 
         let inputField = elemBuild("input", "form-check-input table-checkbox");
-        inputField.setAttribute("data-keyval", keyVal);
+        inputField.setAttribute("data-label", resource)
+        inputField.setAttribute("data-uidval", uidVal);
         inputField.setAttribute("type", "checkbox");
 
         let tdID = elemBuild('td');
@@ -81,12 +81,12 @@ function loadResourcesIntoModal (resource) {
         let tdTags = elemBuild('td');
 
         for (let j=0; j<tagArr.length; j++) {
-            let tagKey = tagArr[j];
-            let tagObj = orgDataObj["tags"].find(item => item.key === tagKey);
+            let tagUid = tagArr[j];
+            let tagObj = orgDataObj["tags"].find(item => item.uid === tagUid);
             if (tagObj) {
                 let tagName = tagObj["name"]
                 let tag = elemBuild("div", "border rounded col text-center tag");
-                tag.setAttribute("value", tagKey);
+                tag.setAttribute("value", tagUid);
                 tag.innerHTML = tagName;
                 tdTags.appendChild(tag);
                 tdTagValue += (tagName + ' ')
@@ -113,13 +113,13 @@ routineSelector.addEventListener("change",  () => {
 
 function drawSelectedRoutine() {
     drawLib.clearRoutineTable();
-    currRoutineKey = routineSelector.options[routineSelector.selectedIndex].value;
-    let routineData = orgRoutines.find(item => item.key === currRoutineKey);
+    currRoutineUid = routineSelector.options[routineSelector.selectedIndex].value;
+    let routineData = orgRoutines.find(item => item.uid === currRoutineUid);
     let routineTasks = routineData["tasks"];
     for (let i=0; i<routineTasks.length; i++) {
         let rT = routineTasks[i];
         drawLib.addTaskCell(
-            rT["key"],
+            rT["uid"],
             rT["day"],
             rT["start"],
             rT["end"],
@@ -141,9 +141,9 @@ function addButtonListeners() {
     })
 }
 
-function editRoutine (taskKey) {
-    let currRoutineTasks = orgRoutines.find(item => item.key === currRoutineKey)["tasks"];
-    let taskData = currRoutineTasks.find(item => item.key === taskKey);
+function editRoutine (taskUid) {
+    let currRoutineTasks = orgRoutines.find(item => item.uid === currRoutineUid)["tasks"];
+    let taskData = currRoutineTasks.find(item => item.uid === taskUid);
 
     // Load name of task as header
     let name = taskData["name"];
@@ -152,11 +152,11 @@ function editRoutine (taskKey) {
 
 
     // # General: Load task values of each input
-    for (const [objKey, objValue] of Object.entries(taskData)) {
-        let inputElement = document.getElementById(objKey);
+    for (const [objUid, objValue] of Object.entries(taskData)) {
+        let inputElement = document.querySelectorAll(`[data-label="${objUid}"]`)[0];
         if (inputElement) {
             inputElement.value = objValue;
-            inputElement.setAttribute("data-value", objValue.toString());
+            inputElement.setAttribute("data-generalvalue", objValue.toString());
         }
     }
 
@@ -169,7 +169,7 @@ function editRoutine (taskKey) {
     }
 
     for (let i=0; i<allResourceRecordsAssigned.length; i++) {
-        let trResourceRecord = document.querySelectorAll(`[data-keyval="${allResourceRecordsAssigned[i]}"]`)[0];
+        let trResourceRecord = document.querySelectorAll(`[data-uidval="${allResourceRecordsAssigned[i]}"]`)[0];
         trResourceRecord.checked = true;
     }
 
@@ -216,18 +216,26 @@ let saveChangesBtn = document.getElementById("save-changes-btn")
 saveChangesBtn.addEventListener("click", () => getInputtedData());
 
 function getInputtedData() {
-    let generalData = document.querySelectorAll("[data-value]");
+    let taskDataObj = {
+        "horses": [],
+        "people": [],
+        "inventory": []
+    }
+    let generalData = document.querySelectorAll("[data-generalvalue]");
     for (let i=0; i<(generalData.length); i++) {
-        console.log()
-        console.log(generalData[i].dataset.value);
+        let label = generalData[i].dataset.label
+        taskDataObj[label] = generalData[i].dataset.generalvalue;
     }
 
-    let checkBoxData = document.querySelectorAll("[data-keyval]");
+    let checkBoxData = document.querySelectorAll("[data-uidval]");
     for (let i=0; i<checkBoxData.length; i++) {
-        if (checkBoxData[i].checked === true){
-            console.log(checkBoxData[i].dataset.keyval)
+        if (checkBoxData[i].checked) {
+            let label = checkBoxData[i].dataset.label
+            let idVal = checkBoxData[i].dataset.uidval
+            taskDataObj[label].push(idVal)
         }
     }
+    console.log(taskDataObj)
 }
 
 

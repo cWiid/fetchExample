@@ -49,21 +49,21 @@
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane show active" id="general-pane" role="tabpanel" aria-labelledby="general-tab">
                             <div class="row form-group">
-                                <label for="name" class="col-sm-2 col-form-label">Name</label>
+                                <label for="name" data-label class="col-sm-2 col-form-label">Name</label>
                                 <div class="col-sm-10">
-                                    <input id="name" type="text" class="form-control general-key"></input>
+                                    <input id="name" data-label="name" type="text" class="form-control general-uid"></input>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="notes" class="col-sm-2 col-form-label">Notes</label>
                                 <div class="col-sm-10">
-                                    <textarea id="notes" class="form-control general-key"></textarea>
+                                    <textarea id="notes" data-label="name" class="form-control general-uid"></textarea>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="day" class="col-sm-2 col-form-label">Day</label>
                                 <div class="col-sm-10">
-                                    <select name="" id="day" class="form-control">
+                                    <select name="" id="day" data-label="day" class="form-control">
                                         <option value="1">Monday</option>
                                         <option value="2">Tuesday</option>
                                         <option value="3">Wednesday</option>
@@ -77,25 +77,25 @@
                             <div class="row form-group">
                                 <label for="start" class="col-sm-2 col-form-label">Start</label>
                                 <div class="col-sm-10">
-                                    <input type="time" id="start" class="form-control general-key"></input>
+                                    <input type="time" id="start" data-label="start" class="form-control general-uid"></input>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="end" class="col-sm-2 col-form-label">End</label>
                                 <div class="col-sm-10">
-                                    <input type="time" id="end" class="form-control general-key"></input>
+                                    <input type="time" id="end" data-label="end" class="form-control general-uid"></input>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="location" class="col-sm-2 col-form-label">Location</label>
                                 <div class="col-sm-10">
-                                    <select name="location" id="location" class="form-control"></select>
+                                    <select name="location" data-label="location" id="location" class="form-control"></select>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="colour" class="col-sm-2 col-form-label">Colour</label>
                                 <div class="col-sm-10">
-                                    <input type="color" name="" id="colour" class="form-control"></input>
+                                    <input type="color" name="colour" data-label="colour" id="colour" class="form-control"></input>
                                 </div>
                             </div>
                         </div>

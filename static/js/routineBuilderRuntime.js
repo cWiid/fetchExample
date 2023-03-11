@@ -2,20 +2,20 @@ import {elemBuild} from "./elemBuild.js";
 import {apiCall} from "./apiFunctions.js";
 import * as drawLib from "./routineDrawLib.js";
 
-const orgDataObj = await apiCall("./get-org-data", "org-placeholder");
-
+const orgDataObj = await apiCall("./get-org-data", "org-placeholder", false);
 
 // INITIAL PAGE LOAD
-const orgRoutines = orgDataObj["routines"];
+const orgTasks = orgDataObj["tasks"];
 let currRoutineUid = 0;
 
 const routineSelector = document.getElementById("select-routine");
 
-function loadRoutinesIntoSelector () {
-    for (let i=0; i<orgRoutines.length; i++) {
+function loadRoutinesIntoSelector() {
+    let routines = orgDataObj["routines"]
+    for (let i=0; i<routines.length; i++) {
 
-        let routineUid = orgRoutines[i]["uid"];
-        let routineName = orgRoutines[i]["name"];
+        let routineUid = routines[i]["uid"];
+        let routineName = routines[i]["name"];
 
         let routineOption = elemBuild("option", "routine-opt");
         routineOption.setAttribute("value", routineUid);
@@ -32,33 +32,31 @@ function loadRoutinesIntoSelector () {
 
 }
 
-function loadLocationsIntoModal() {
-    // Load organisation's locations into general panel
-    let locations = orgDataObj["locations"];
-    let locationSelector = document.getElementById("location");
+function loadSelectorIntoModal(key) {
+    let keys = orgDataObj[key];
+    let selector = document.getElementById(key);
 
-    for (let i=0; i<locations.length; i++) {
-        let uidVal = locations[i]["uid"];
-        let nameVal = locations[i]["name"];
-        let locationOption = elemBuild("option");
-        locationOption.setAttribute("value", uidVal);
-        locationOption.innerHTML = nameVal;
+    keys.forEach(key => {
+        let uidVal = key["uid"];
+        let nameVal = key["name"];
+        let option = elemBuild("option");
+        option.setAttribute("value", uidVal);
+        option.innerHTML = nameVal;
 
-        locationSelector.appendChild(locationOption);
-    }
+        selector.appendChild(option);
+    })
 }
 
-function loadResourcesIntoModal (resource) {
+function loadResourcesIntoModal(resource) {
     // Load organisation's horses, people or inventory into their respective panels
     let resourceObj = orgDataObj[resource];
     let resourceTable = document.getElementById(`${resource}-table-body`);
 
-    for (let i=0; i<resourceObj.length; i++) {
-        let tdTagValue = ''
-        let uidVal = resourceObj[i]["uid"];
-        let idVal = resourceObj[i]["id"];
-        let nameVal = resourceObj[i]["name"];
-        let tagArr = resourceObj[i]["tags"];
+    resourceObj.forEach(item => {
+        let uidVal = item["uid"];
+        let idVal = item["id"];
+        let nameVal = item["name"];
+        let tagArr = item["tags"];
 
         let tr = elemBuild("tr", "resource-record");
 
@@ -67,7 +65,7 @@ function loadResourcesIntoModal (resource) {
 
         let inputField = elemBuild("input", "form-check-input table-checkbox");
         inputField.setAttribute("data-label", resource)
-        inputField.setAttribute("data-uidval", uidVal);
+        inputField.setAttribute("data-resourceuid", uidVal);
         inputField.setAttribute("type", "checkbox");
 
         let tdID = elemBuild('td');
@@ -78,22 +76,7 @@ function loadResourcesIntoModal (resource) {
         tdID.setAttribute("value", nameVal);
         tdName.innerHTML = nameVal;
 
-        let tdTags = elemBuild('td');
-
-        for (let j=0; j<tagArr.length; j++) {
-            let tagUid = tagArr[j];
-            let tagObj = orgDataObj["tags"].find(item => item.uid === tagUid);
-            if (tagObj) {
-                let tagName = tagObj["name"]
-                let tag = elemBuild("div", "border rounded col text-center tag");
-                tag.setAttribute("value", tagUid);
-                tag.innerHTML = tagName;
-                tdTags.appendChild(tag);
-                tdTagValue += (tagName + ' ')
-            }
-        }
-
-        tdTags.setAttribute("value", tdTagValue)
+        let tdTags = createTagCell(tagArr)
 
         th.appendChild(inputField);
         tr.appendChild(th);
@@ -101,9 +84,28 @@ function loadResourcesIntoModal (resource) {
         tr.appendChild(tdName);
         tr.appendChild(tdTags);
         resourceTable.appendChild(tr);
-    }
+    });
 }
 
+function createTagCell(tagArr) {
+    let tdTagValue = ''
+    let tdTags = elemBuild('td');
+
+    tagArr.forEach(tagUid => {
+        let tagObj = orgDataObj["tags"].find(item => item["uid"] === tagUid);
+        if (tagObj) {
+            let tagName = tagObj["name"]
+            let tagElem = elemBuild("div", "border rounded col text-center tag");
+            tagElem.setAttribute("value", tagUid);
+            tagElem.innerHTML = tagName;
+            tdTags.appendChild(tagElem);
+            tdTagValue += (tagName + ' ')
+        }
+    });
+
+    tdTags.setAttribute("value", tdTagValue)
+    return tdTags
+}
 
 // ROUTINE SELECTOR
 
@@ -112,22 +114,22 @@ routineSelector.addEventListener("change",  () => {
 })
 
 function drawSelectedRoutine() {
-    drawLib.clearRoutineTable();
+    drawLib.clearRoutineTable()
     currRoutineUid = routineSelector.options[routineSelector.selectedIndex].value;
-    let routineData = orgRoutines.find(item => item.uid === currRoutineUid);
-    let routineTasks = routineData["tasks"];
-    for (let i=0; i<routineTasks.length; i++) {
-        let rT = routineTasks[i];
-        drawLib.addTaskCell(
-            rT["uid"],
-            rT["day"],
-            rT["start"],
-            rT["end"],
-            rT["name"],
-            rT["colour"]
-        );
-    }
+    orgTasks.forEach(task => {
+        if (task["routine"] === currRoutineUid) {
+            drawLib.addTaskCell(
+                task["uid"],
+                task["days"],
+                task["start"],
+                task["end"],
+                task["name"],
+                task["colour"]
+            );
+        }
+    });
     addButtonListeners();
+    drawLib.scrollToTopLeftTask();
 }
 
 
@@ -136,43 +138,58 @@ function drawSelectedRoutine() {
 function addButtonListeners() {
     let taskButtons = document.querySelectorAll(".task-cell");
 
-    taskButtons.forEach(function(btn) {
-        btn.addEventListener("click", () => editRoutine(btn.value));
-    })
+    if (taskButtons) {
+        taskButtons.forEach(btn => {
+            btn.addEventListener("click", () => editRoutine(btn.dataset.taskuid));
+        })
+    }
 }
 
-function editRoutine (taskUid) {
-    let currRoutineTasks = orgRoutines.find(item => item.uid === currRoutineUid)["tasks"];
-    let taskData = currRoutineTasks.find(item => item.uid === taskUid);
+
+function editRoutine(taskUid) {
+    let taskData = orgTasks.find(item => item.uid === taskUid);
 
     // Load name of task as header
     let name = taskData["name"];
     let modalTitle = document.getElementById("edit-task-title");
     modalTitle.innerHTML = `Edit "${name}"`;
 
+    // Load uid of task into header dataset
+    modalTitle.setAttribute("data-taskuidval", taskUid)
 
     // # General: Load task values of each input
-    for (const [objUid, objValue] of Object.entries(taskData)) {
-        let inputElement = document.querySelectorAll(`[data-label="${objUid}"]`)[0];
+    for (const [objKey, objValue] of Object.entries(taskData)) {
+        let inputElement = document.querySelectorAll(`[data-label="${objKey}"]`)[0];
         if (inputElement) {
             inputElement.value = objValue;
-            inputElement.setAttribute("data-generalvalue", objValue.toString());
+            inputElement.setAttribute("data-generalval", objValue.toString());
         }
     }
 
+    // # Day checkboxes
+    let dayCheckboxes = document.querySelectorAll("[data-day]")
+    dayCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    })
+
+    let taskDays = taskData["days"]
+    taskDays.forEach(day => {
+        let dayCheckbox = document.querySelectorAll(`[data-day="${day}"]`)[0];
+        dayCheckbox.checked = true;
+    })
+
     // # Horses, people and inventory panels
-    let allResourceRecordsAssigned = taskData["herd"].concat(taskData["team"], taskData["equipment"]);
-    let allTableCheckboxes = document.getElementsByClassName("table-checkbox");
+    let tableCheckboxes = document.querySelectorAll(".table-checkbox");
 
-    for (let i=0; i<allTableCheckboxes.length; i++) {
-        allTableCheckboxes[i].checked = false;
-    }
+    tableCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    })
 
-    for (let i=0; i<allResourceRecordsAssigned.length; i++) {
-        let trResourceRecord = document.querySelectorAll(`[data-uidval="${allResourceRecordsAssigned[i]}"]`)[0];
+    let resourceUidsAssigned = taskData["herd"].concat(taskData["team"], taskData["equipment"]);
+    resourceUidsAssigned.forEach(uid => {
+        let trResourceRecord = document.querySelectorAll(`[data-resourceuid="${uid}"]`)[0];
         trResourceRecord.checked = true;
-    }
-
+    })
 }
 
 
@@ -181,7 +198,7 @@ function editRoutine (taskUid) {
 function addSearchListeners() {
     let searchBars = document.querySelectorAll(".search");
 
-    searchBars.forEach(function(searchBar) {
+    searchBars.forEach(searchBar => {
         searchBar.addEventListener("keyup", () => searchTable(searchBar.name));
     })
 }
@@ -196,53 +213,87 @@ function searchTable(resource) {
     let tableRow = table.getElementsByTagName("tr");
 
     // Loop through all table rows, and hide those who don't match the search query
-    for (let i = 0; i < tableRow.length; i++) {
-        let tableData = tableRow[i].getElementsByTagName("td")[searchType];
+    tableRow.forEach(row => {
+        let tableData = row.getElementsByTagName("td")[searchType];
         if (tableData) {
             let txtValue = tableData.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tableRow[i].style.display = "";
+                row.style.display = "";
             } else {
-                tableRow[i].style.display = "none";
+                row.style.display = "none";
             }
         }
-    }
+    });
 }
 
+// SAVE MODAL EDITS
+
+let saveChangesBtn = document.getElementById("save-changes-btn");
+saveChangesBtn.addEventListener("click", () => saveTask());
+
+async function saveTask() {
+    let taskDataObj = getInputtedData();
+    await apiCall("./post-edited-task", JSON.stringify(taskDataObj), true);
+
+    let currTask = orgTasks.find(task => task["uid"] === taskDataObj["uid"]);
+    if (currTask) {
+        let currTaskIndex = orgTasks.indexOf(currTask);
+        console.log(orgTasks);
+        orgTasks[currTaskIndex] = taskDataObj;
+    }
+    else {
+        throw new Error(`Original task with uid ${taskDataObj.uid} does not exist.`);
+    }
+    drawSelectedRoutine();
+}
 
 // RETRIEVE TASK VALUES FROM MODAL
 
-let saveChangesBtn = document.getElementById("save-changes-btn")
-saveChangesBtn.addEventListener("click", () => getInputtedData());
-
 function getInputtedData() {
     let taskDataObj = {
+        "days": [],
         "horses": [],
         "people": [],
         "inventory": []
-    }
-    let generalData = document.querySelectorAll("[data-generalvalue]");
-    for (let i=0; i<(generalData.length); i++) {
-        let label = generalData[i].dataset.label
-        taskDataObj[label] = generalData[i].dataset.generalvalue;
-    }
+    };
 
-    let checkBoxData = document.querySelectorAll("[data-uidval]");
-    for (let i=0; i<checkBoxData.length; i++) {
-        if (checkBoxData[i].checked) {
-            let label = checkBoxData[i].dataset.label
-            let idVal = checkBoxData[i].dataset.uidval
-            taskDataObj[label].push(idVal)
+    // Add task uid
+    let modalHeader = document.getElementById("edit-task-title");
+    taskDataObj["uid"] = modalHeader.dataset.taskuidval;
+
+    // Add general data
+    let generalData = document.querySelectorAll("[data-generalval]");
+    generalData.forEach(field => {
+        let label = field.dataset.label;
+        taskDataObj[label] = field.dataset.generalval;
+    });
+
+    // Add days data
+    let allDayCheckboxes = document.querySelectorAll("[data-day]");
+    for (let i=0; i<7; i++) {
+        if (allDayCheckboxes[i].checked) {
+            taskDataObj["days"].push(allDayCheckboxes[i].dataset.day);
         }
     }
-    console.log(taskDataObj)
+
+    // Add resource data
+    let checkBoxData = document.querySelectorAll("[data-resourceuid]");
+    checkBoxData.forEach(checkbox => {
+        if (checkbox.checked) {
+            let label = checkbox.dataset.label;
+            let idVal = checkbox.dataset.resourceuid;
+            taskDataObj[label].push(idVal);
+        }
+    });
+    return taskDataObj
 }
 
 
 // INIT
 
 loadRoutinesIntoSelector();
-loadLocationsIntoModal();
+loadSelectorIntoModal("routines");
+loadSelectorIntoModal("locations");
 loadResourcesIntoModal("horses");
 loadResourcesIntoModal("people");
 loadResourcesIntoModal("inventory");

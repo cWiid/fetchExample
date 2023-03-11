@@ -4,69 +4,72 @@ def org_resources_dump():
     routines = [
         {
             "uid": "11",
-            "name": "routine1",
-            "tasks": [
-                {
-                    "uid": "01",
-                    "name": "TASK1",
-                    "day": 1,
-                    "start": "12:00",
-                    "end": "15:00",
-                    "location": "31",
-                    "herd": ["41", "42", "43"],
-                    "team": ["51", "52"],
-                    "equipment": ["61"],
-                    "colour": "#0d6efd",
-                    "notes": "neigh neigh neigh neigh neigh neigh neigh"
-                },
-                {
-                    "uid": "02",
-                    "name": "TASK2",
-                    "day": 1,
-                    "start": "11:30",
-                    "end": "13:30",
-                    "location": "32",
-                    "herd": ["41", "42"],
-                    "team": ["51", "52"],
-                    "equipment": ["61"],
-                    "colour": "#fd7e14",
-                    "notes": "neigh neigh neigh neigh neigh neigh neigh"
-
-                }
-            ]
+            "name": "summer"
         },
         {
             "uid": "12",
-            "name": "routine2",
-            "tasks": [
-                {
-                    "uid": "03",
-                    "name": "task1",
-                    "day": 2,
-                    "start": "08:15",
-                    "end": "15:05",
-                    "location": "32",
-                    "herd": ["41"],
-                    "team": ["51", "52"],
-                    "equipment": ["61"],
-                    "colour": "#dc3545",
-                    "notes": "neigh neigh neigh neigh neigh neigh neigh"
-                },
-                {
-                    "uid": "4",
-                    "name": "task2",
-                    "day": 5,
-                    "start": "10:00",
-                    "end": "10:03",
-                    "location": "31",
-                    "herd": ["42", "43"],
-                    "team": ["51", "52"],
-                    "equipment": ["61"],
-                    "colour": "#ffc107",
-                    "notes": "neigh neigh neigh neigh neigh neigh neigh"
+            "name": "winter"
+        }
+    ]
 
-                }
-            ]
+    tasks = [
+        {
+            "uid": "01",
+            "name": "TASK1",
+            "routine": "11",
+            "days": [1, 4],
+            "start": "12:00",
+            "end": "15:00",
+            "location": "31",
+            "herd": ["41", "42", "43"],
+            "team": ["51", "52"],
+            "equipment": ["61"],
+            "colour": "#0d6efd",
+            "notes": "neigh neigh neigh neigh neigh neigh neigh"
+        },
+        {
+            "uid": "02",
+            "name": "TASK2",
+            "routine": "11",
+            "days": [1, 5],
+            "start": "11:30",
+            "end": "13:30",
+            "location": "32",
+            "herd": ["41", "42"],
+            "team": ["51", "52"],
+            "equipment": ["61"],
+            "colour": "#fd7e14",
+            "notes": "neigh neigh neigh neigh neigh neigh neigh"
+
+        },
+        {
+            "uid": "03",
+            "name": "task1",
+            "routine": "12",
+            "days": [4, 7],
+            "start": "08:15",
+            "end": "15:05",
+            "location": "32",
+            "herd": ["41"],
+            "team": ["51", "52"],
+            "equipment": ["61"],
+            "colour": "#dc3545",
+            "notes": "neigh neigh neigh neigh neigh neigh neigh"
+        },
+        {
+            "uid": "4",
+            "name": "task2",
+            "routine": "12",
+            "days": [3, 4, 6],
+            "start": "10:00",
+            "end": "10:03",
+            "location": "31",
+            "herd": ["42", "43"],
+            "team": ["51", "52"],
+            "equipment": ["61"],
+            "colour": "#ffc107",
+            "notes": "neigh neigh neigh neigh neigh neigh neigh"
+
         }
     ]
 
@@ -160,6 +163,7 @@ def org_resources_dump():
     org_resources_json = {
         "tags": tags,
         "routines": routines,
+        "tasks": tasks,
         "locations": locations,
         "horses": horses,
         "people": personnel,

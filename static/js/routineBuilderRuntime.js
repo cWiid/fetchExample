@@ -114,7 +114,6 @@ routineSelector.addEventListener("change",  () => {
 })
 
 function drawSelectedRoutine() {
-    console.log("drawing")
     drawLib.clearRoutineTable()
     currRoutineUid = routineSelector.options[routineSelector.selectedIndex].value;
     orgTasks.forEach(task => {
@@ -161,7 +160,7 @@ function editRoutine(taskUid) {
     // # General: Load task values of each input
     for (const [objKey, objValue] of Object.entries(taskData)) {
         let inputElement = document.querySelectorAll(`[data-label="${objKey}"]`)[0];
-        if (inputElement) {
+        if (inputElement && inputElement.classList.contains("general-key")) {
             inputElement.value = objValue;
             inputElement.setAttribute("data-generalval", objValue.toString());
         }
@@ -186,7 +185,7 @@ function editRoutine(taskUid) {
         checkbox.checked = false;
     })
 
-    let resourceUidsAssigned = taskData["herd"].concat(taskData["team"], taskData["equipment"]);
+    let resourceUidsAssigned = taskData["horses"].concat(taskData["people"], taskData["inventory"]);
     resourceUidsAssigned.forEach(uid => {
         let trResourceRecord = document.querySelectorAll(`[data-resourceuid="${uid}"]`)[0];
         trResourceRecord.checked = true;
@@ -239,7 +238,6 @@ async function saveTask() {
     let currTask = orgTasks.find(task => task["uid"] === taskDataObj["uid"]);
     if (currTask) {
         let currTaskIndex = orgTasks.indexOf(currTask);
-        console.log(orgTasks);
         orgTasks[currTaskIndex] = taskDataObj;
     }
     else {
@@ -282,8 +280,8 @@ function getInputtedData() {
     checkBoxData.forEach(checkbox => {
         if (checkbox.checked) {
             let label = checkbox.dataset.label;
-            let idVal = checkbox.dataset.resourceuid;
-            taskDataObj[label].push(idVal);
+            let uidVal = checkbox.dataset.resourceuid;
+            taskDataObj[label].push(uidVal);
         }
     });
 

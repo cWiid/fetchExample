@@ -21,9 +21,9 @@ def org_resources_dump():
             "start": "12:00",
             "end": "15:00",
             "location": "31",
-            "herd": ["41", "42", "43"],
-            "team": ["51", "52"],
-            "equipment": ["61"],
+            "horses": ["41", "42", "43"],
+            "people": ["51", "52"],
+            "inventory": ["61"],
             "colour": "#0d6efd",
             "notes": "neigh neigh neigh neigh neigh neigh neigh"
         },
@@ -35,9 +35,9 @@ def org_resources_dump():
             "start": "11:30",
             "end": "13:30",
             "location": "32",
-            "herd": ["41", "42"],
-            "team": ["51", "52"],
-            "equipment": ["61"],
+            "horses": ["41", "42"],
+            "people": ["51", "52"],
+            "inventory": ["61"],
             "colour": "#fd7e14",
             "notes": "neigh neigh neigh neigh neigh neigh neigh"
 
@@ -50,9 +50,9 @@ def org_resources_dump():
             "start": "08:15",
             "end": "15:05",
             "location": "32",
-            "herd": ["41"],
-            "team": ["51", "52"],
-            "equipment": ["61"],
+            "horses": ["41"],
+            "people": ["51", "52"],
+            "inventory": ["61"],
             "colour": "#dc3545",
             "notes": "neigh neigh neigh neigh neigh neigh neigh"
         },
@@ -64,9 +64,9 @@ def org_resources_dump():
             "start": "10:00",
             "end": "10:03",
             "location": "31",
-            "herd": ["42", "43"],
-            "team": ["51", "52"],
-            "equipment": ["61"],
+            "horses": ["42", "43"],
+            "people": ["51", "52"],
+            "inventory": ["61"],
             "colour": "#ffc107",
             "notes": "neigh neigh neigh neigh neigh neigh neigh"
 

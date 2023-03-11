@@ -114,6 +114,7 @@ routineSelector.addEventListener("change",  () => {
 })
 
 function drawSelectedRoutine() {
+    console.log("drawing")
     drawLib.clearRoutineTable()
     currRoutineUid = routineSelector.options[routineSelector.selectedIndex].value;
     orgTasks.forEach(task => {
@@ -285,6 +286,8 @@ function getInputtedData() {
             taskDataObj[label].push(idVal);
         }
     });
+
+    taskDataObj["routine"] = currRoutineUid;
     return taskDataObj
 }
 

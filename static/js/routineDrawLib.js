@@ -22,16 +22,15 @@ export function clearRoutineTable () {
     }
 }
 
-export function addTaskCell(key, days, start, end, name, colour) {
-    for (let i=0; i<days.length; i++) {
-        let day = days[i]
+export function addTaskCell(uid, days, start, end, name, colour) {
+    days.forEach(day => {
         let taskContainer = document.getElementById("routine-table").children[parseInt(day)].lastChild;
         let startTime = timeToMin(start);
         let endTime = timeToMin(end);
         let duration = endTime - startTime;
 
         let taskCell = elemBuild("button", "btn col task-cell")
-        taskCell.setAttribute("data-taskuid", key)
+        taskCell.setAttribute("data-taskuid", uid)
         taskCell.setAttribute("type", "button")
         taskCell.setAttribute("data-bs-toggle", "modal")
         taskCell.setAttribute("data-bs-target", "#edit-task")
@@ -41,9 +40,10 @@ export function addTaskCell(key, days, start, end, name, colour) {
                     top: ${startTime * pixelPerMin}px;`
         );
         taskCell.innerHTML = `${name}<br>${start}<br>↓<br>${end}`
+        console.log(taskCell)
 
         taskContainer.appendChild(taskCell)
-    }
+    });
 }
 
 export function scrollToTopLeftTask() {

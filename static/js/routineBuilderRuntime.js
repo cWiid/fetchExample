@@ -8,7 +8,7 @@ const orgDataObj = await apiCall("./get-org-data", "org-placeholder", false);
 const orgTasks = orgDataObj["tasks"];
 let currRoutineUid = 0;
 
-const routineSelector = document.getElementById("select-routine");
+const routineSelector = document.getElementById("routine-select");
 
 function loadRoutinesIntoSelector() {
     let routines = orgDataObj["routines"]
@@ -33,12 +33,12 @@ function loadRoutinesIntoSelector() {
 }
 
 function loadSelectorIntoModal(key) {
-    let keys = orgDataObj[key];
+    let vals = orgDataObj[key.concat("s")];
     let selector = document.getElementById(key);
 
-    keys.forEach(key => {
-        let uidVal = key["uid"];
-        let nameVal = key["name"];
+    vals.forEach(val => {
+        let uidVal = val["uid"];
+        let nameVal = val["name"];
         let option = elemBuild("option");
         option.setAttribute("value", uidVal);
         option.innerHTML = nameVal;
@@ -129,7 +129,6 @@ function drawSelectedRoutine() {
         }
     });
     addButtonListeners();
-    drawLib.scrollToTopLeftTask();
 }
 
 
@@ -261,10 +260,10 @@ function getInputtedData() {
     taskDataObj["uid"] = modalHeader.dataset.taskuidval;
 
     // Add general data
-    let generalData = document.querySelectorAll("[data-generalval]");
+    let generalData = Array.from(document.getElementsByClassName("general-key"));
     generalData.forEach(field => {
         let label = field.dataset.label;
-        taskDataObj[label] = field.dataset.generalval;
+        taskDataObj[label] = field.value;
     });
 
     // Add days data
@@ -285,7 +284,6 @@ function getInputtedData() {
         }
     });
 
-    taskDataObj["routine"] = currRoutineUid;
     return taskDataObj
 }
 
@@ -293,10 +291,11 @@ function getInputtedData() {
 // INIT
 
 loadRoutinesIntoSelector();
-loadSelectorIntoModal("routines");
-loadSelectorIntoModal("locations");
+loadSelectorIntoModal("routine");
+loadSelectorIntoModal("location");
 loadResourcesIntoModal("horses");
 loadResourcesIntoModal("people");
 loadResourcesIntoModal("inventory");
 drawSelectedRoutine();
 addSearchListeners();
+drawLib.scrollToTopLeftTask();

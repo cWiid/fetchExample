@@ -40,7 +40,6 @@ export function addTaskCell(uid, days, start, end, name, colour) {
                     top: ${startTime * pixelPerMin}px;`
         );
         taskCell.innerHTML = `${name}<br>${start}<br>↓<br>${end}`
-        console.log(taskCell)
 
         taskContainer.appendChild(taskCell)
     });
@@ -57,7 +56,6 @@ export function scrollToTopLeftTask() {
             }
             if (btn.offsetLeft < leftPixel) {
                 leftPixel = btn.offsetLeft;
-                console.log(leftPixel)
             }
         })
 

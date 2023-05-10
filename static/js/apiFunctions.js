@@ -19,6 +19,9 @@ export function apiCall(url, jsInput, validationCall= false) {
                 if (!validationCall) {
                     return result.json();
                 }
+                else {
+                    return true
+                }
             } else {
                 const message = 'An error has occurred: '.concat(result.status.toString());
                 throw new Error(message)

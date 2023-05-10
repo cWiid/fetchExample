@@ -57,7 +57,7 @@ def org_resources_dump():
             "notes": "neigh neigh neigh neigh neigh neigh neigh"
         },
         {
-            "uid": "4",
+            "uid": "04",
             "name": "task2",
             "routine": "12",
             "days": [3, 4, 6],
@@ -171,3 +171,16 @@ def org_resources_dump():
     }
 
     return org_resources_json
+
+
+uid = 10
+
+
+def replace_edited_task():
+    return "Success", 200
+
+
+def store_new_task():
+    global uid
+    uid += 1
+    return str(uid)

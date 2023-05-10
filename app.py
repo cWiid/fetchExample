@@ -25,23 +25,21 @@ def get_org_data():
 def post_edited_task():
     task_data = request.get_json()
     print(task_data)
-    return "Success", 200
+    return stubs.replace_edited_task()
 
 
 @app.route('/post-new-task', methods=["GET", "POST"])
 def post_new_task():
-    js_input = request.get_json()
-    org_data = stubs.org_resources_dump()
-    print(org_data)
-    return jsonify(org_data)
+    task = request.get_json()
+    print(task)
+    return stubs.store_new_task()
 
 
 @app.route('/post-delete-task', methods=["GET", "POST"])
 def post_delete_task():
-    js_input = request.get_json()
-    org_data = stubs.org_resources_dump()
-    print(org_data)
-    return jsonify(org_data)
+    task_data = request.get_json()
+    print(task_data)
+    return "Success", 200
 
 
 @app.route('/post-new-routine', methods=["GET", "POST"])

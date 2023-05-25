@@ -454,13 +454,30 @@ function updateFilterDatatype() {
     filterDatatype = filterDatatypeSelector.value;
 
     if (filterDatatype !== 'not-selected') {
-        if (filterDatatype === 'locations') {
-            loadLocationsIntoModal();
-        }
-        else {
-            loadFilterResources(filterDatatype);
-        }
+        loadFilterResources(filterDatatype);
     }
+}
+
+function loadFilterResources(filterDatatype) {
+    filterTable.innerHTML = ''
+
+    if (filterDatatype === 'locations') {
+        loadLocationsIntoModal()
+    }
+    else {
+        loadResourcesIntoModal(filterDatatype, "filteruid", "filter");
+    }
+
+    let tableCheckboxes = document.querySelectorAll("[data-filteruid]");
+
+    tableCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    })
+
+    filter[filterDatatype].forEach(uid => {
+        let trFilterRecord = document.querySelectorAll(`[data-filteruid="${uid}"]`)[0]
+        trFilterRecord.checked = true;
+    })
 }
 
 function loadLocationsIntoModal() {
@@ -492,22 +509,6 @@ function loadLocationsIntoModal() {
 }
 
 
-function loadFilterResources(filterDatatype) {
-    filterTable.innerHTML = ''
-    loadResourcesIntoModal(filterDatatype, "filteruid", "filter");
-
-    let tableCheckboxes = document.querySelectorAll("[data-filteruid]");
-
-    tableCheckboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    })
-
-    filter[filterDatatype].forEach(uid => {
-        let trFilterRecord = document.querySelectorAll(`[data-filteruid="${uid}"]`)[0]
-        trFilterRecord.checked = true;
-    })
-}
-
 function getFilterUids() {
     let uids;
     uids = [];
@@ -525,12 +526,19 @@ function findVisibleTasks(datatype, uids) {
     visibleTaskUids = [];
     uids.forEach(uid => {
         orgTasks.forEach(task => {
-            task[datatype].forEach(item => {
-                let taskUid = task["uid"];
-                if (item === uid && !visibleTaskUids.includes(taskUid)) {
-                    visibleTaskUids.push(taskUid);
+            if (datatype === 'locations') {
+                if (task['location'] === uid) {
+                    visibleTaskUids.push(task['uid'])
                 }
-            });
+            }
+            else {
+                task[datatype].forEach(item => {
+                    let taskUid = task["uid"];
+                    if (item === uid && !visibleTaskUids.includes(taskUid)) {
+                        visibleTaskUids.push(taskUid);
+                    }
+                });
+            }
         });
     });
     return visibleTaskUids;
@@ -543,13 +551,7 @@ function applyFilter(datatype) {
     uids.forEach(uid => {
         filter[datatype].push(uid);
     })
-
-    if (datatype === 'location') {
-
-    }
-    else {
-        visibleTaskUids = findVisibleTasks(datatype, filter[datatype]);
-    }
+    visibleTaskUids = findVisibleTasks(datatype, filter[datatype]);
     drawRoutine();
 }
 

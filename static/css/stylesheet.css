@@ -119,3 +119,14 @@
     padding: 0.4rem;
     margin-left: 0.4rem;
 }
+
+.action-btn {
+    display: inline-block;
+    padding: 0.4rem;
+    margin-left: 0.4rem;
+}
+
+.search-container {
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+}

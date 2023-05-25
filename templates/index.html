@@ -11,30 +11,23 @@
     <div class="container">
         <div id="table-sticky-top" class="col border-bottom border-1 sticky-top row">
             <div class="col">
-                <button class="btn btn-primary" id="new-task-btn" data-bs-target= "#edit-task" data-bs-toggle="modal">+ New Task</button>
+                <button type="button" class="btn btn-outline-primary float-right" data-bs-target= "#edit-task" data-bs-toggle="modal" id="new-task-btn">+ Task</button>
             </div>
             <div class="col">
-                <label for="routine-select" class="col-sm-2 col-form-label">Routine:</label>
+                <div class="row">
+                    <div class="col-sm-3 col-form-label">Routine:</div>
+                    <div class="col">
+                        <select name="routine-select" class="form-control" id="routine-select">
+                            <option value="not-selected" disabled>Select Routine...</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div class="col">
-                <select name="routine-select" class="col form-control" id="routine-select">
-                    <option value="not-selected" disabled>Select Routine...</option>
-                </select>
+                <button class="btn btn-outline-primary" id="manage-routines-btn" data-bs-target="#manage-routines" data-bs-toggle="modal">My Routines</button>
             </div>
             <div class="col">
-                <label for="filter-datatype-select" class="col-sm-2 col-form-label">Filter:</label>
-            </div>
-            <div class="col">
-                <select id="filter-datatype-select" name="filter-datatype-select" class="col form-control" selected="">
-                    <option value="not-selected" disabled selected>Select Datatype...</option>
-                    <option value="locations">Locations</option>
-                    <option value="horses">Horses</option>
-                    <option value="people">People</option>
-                    <option value="inventory">Inventory</option>
-                </select>
-            </div>
-            <div class="col">
-                <button class="btn btn-primary" id="filter-btn" data-bs-target= "#filter-modal" data-bs-toggle="modal">Filter...</button>
+                <button class="btn btn-outline-primary position-end" id="filter-btn" data-bs-target= "#filter-modal" data-bs-toggle="modal">Filter...</button>
             </div>
         </div>
         <div id="routine-app"></div>
@@ -46,7 +39,7 @@
             <div class="modal-content">
                 <div class="modal-header">
 
-                    <h5 class="modal-title" id="edit-task-title"></h5>
+                        <h5 class="modal-title" id="edit-task-title"></h5>
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
@@ -164,7 +157,7 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="horses-pane" role="tabpanel" aria-labelledby="horses-tab">
-                            <div class="row">
+                            <div class="row search-container">
                                 <div class="col-3">
                                     <select id="horses-search-type" class="form-control">
                                         <option value="0">ID</option>
@@ -193,7 +186,7 @@
                         </div>
 
                         <div class="tab-pane" id="people-pane" role="tabpanel" aria-labelledby="people-tab">
-                            <div class="row">
+                            <div class="row search-container">
                                 <div class="col-3">
                                     <select id="people-search-type" class="form-control">
                                         <option value="0">ID</option>
@@ -221,7 +214,7 @@
                             </table>
                         </div>
                         <div class="tab-pane" id="inventory-pane" role="tabpanel" aria-labelledby="inventory-tab">
-                            <div class="row">
+                            <div class="row search-container">
                                 <div class="col-3">
                                     <select id="inventory-search-type" class="form-control">
                                         <option value="0">ID</option>
@@ -259,7 +252,7 @@
                 </div>
                 <div class="modal-footer" id="new-task-footer" hidden>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="create-new-task-btn">Create task</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="create-new-task-btn">Create</button>
                 </div>
             </div>
         </div>
@@ -269,13 +262,26 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="filter-title"></h5>
+                    <h5 class="modal-title" id="filter-title">Filter tasks by resource</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="row">
+                    <div class="row filter-container">
+                        <span for="filter-datatype-select" class="col-3 col-form-label">Filter by:</span>
+                        <div class="col">
+                            <select id="filter-datatype-select" name="filter-datatype-select" class="col form-control" selected="">
+                                <option value="not-selected" disabled selected>Select Datatype...</option>
+                                <option value="locations">Locations</option>
+                                <option value="horses">Horses</option>
+                                <option value="people">People</option>
+                                <option value="inventory">Inventory</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row search-container">
                         <div class="col-3">
                             <select id="filter-search-type" class="form-control">
                                 <option value="0">ID</option>
@@ -286,22 +292,55 @@
                         <div class="col">
                             <input type="text" id="filter-search" name="filter-search" class="search form-control" placeholder="Search...">
                         </div>
-                        <table class="table table-bordered" id="inventory-table">
-                            <thead>
+                    </div>
+                    <table class="table table-bordered" id="inventory-table">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="col-1">
+                                <input type="checkbox" class="form-check-input" id="select-all-checkbox"></input>
+                            </th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Tags</th>
+                        </tr>
+                        </thead>
+                        <tbody id="filter-table-body" data-last-resource=""></tbody>
+                    </table>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-primary" id="reset-filter-btn">Reset</button>
+                        <button type="button" class="btn btn-primary" id="apply-filter-btn" data-bs-dismiss="modal">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="manage-routines" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filter-title">Manage Routines</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <table class="table table-bordered" id="inventory-table">
+                        <thead>
                             <tr>
-                                <th scope="col" class="col-1">
-                                    <input type="checkbox" class="form-check-input" id="select-all-checkbox"></input>
-                                </th>
-                                <th scope="col">ID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Tags</th>
+                                <th scope="col">Routine</th>
+                                <th scope="col"></th>
                             </tr>
-                            </thead>
-                            <tbody id="filter-table-body" data-last-resource=""></tbody>
-                        </table>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="apply-filter-btn" data-bs-dismiss="modal" id="save-task-btn">Apply Filter</button>
-                        </div>
+                        </thead>
+                        <tbody id="routine-table-body"></tbody>
+                    </table>
+
+                    <button type="button" class="btn btn-primary float-right" id="new-routine-btn">+ New Routine</button>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

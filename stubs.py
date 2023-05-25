@@ -180,7 +180,25 @@ def replace_edited_task():
     return "Success", 200
 
 
+def delete_task():
+    return "Success", 200
+
+
 def store_new_task():
+    global uid
+    uid += 1
+    return str(uid)
+
+
+def replace_edited_routine():
+    return "Success", 200
+
+
+def delete_routine():
+    return "Success", 200
+
+
+def store_new_routine():
     global uid
     uid += 1
     return str(uid)

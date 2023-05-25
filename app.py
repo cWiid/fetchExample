@@ -39,23 +39,28 @@ def post_new_task():
 def post_delete_task():
     task_data = request.get_json()
     print(task_data)
-    return "Success", 200
+    return stubs.delete_task()
+
+
+@app.route('/post-edited-routine', methods=["GET", "POST"])
+def post_edited_routine():
+    js_input = request.get_json()
+    print(js_input)
+    return stubs.replace_edited_routine()
 
 
 @app.route('/post-new-routine', methods=["GET", "POST"])
 def post_new_routine():
     js_input = request.get_json()
-    org_data = stubs.org_resources_dump()
-    print(org_data)
-    return jsonify(org_data)
+    print(js_input)
+    return stubs.store_new_routine()
 
 
 @app.route('/post-delete-routine', methods=["GET", "POST"])
 def post_delete_routine():
     js_input = request.get_json()
-    org_data = stubs.org_resources_dump()
-    print(org_data)
-    return jsonify(org_data)
+    print(js_input)
+    return stubs.delete_routine()
 
 
 if __name__ == '__main__':

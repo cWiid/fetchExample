@@ -12,7 +12,7 @@ function fetchInit(jsonData) {
 }
 
 
-export function apiCall(url, jsInput, validationCall= false) {
+export function apiCall(url, jsInput, validationCall = false) {
     return fetch(url, fetchInit(jsInput))
         .then(result=> {
             if (result.ok) {

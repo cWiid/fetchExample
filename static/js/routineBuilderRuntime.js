@@ -11,6 +11,12 @@ const errGet = "Something went wrong. " +
     "Your changes were not saved to the server. " +
     "Ensure you are connected to the internet and try again."
 let orgTasks = orgDataObj["tasks"];
+let filter = {
+    'locations': [],
+    'horses': [],
+    'people': [],
+    'inventory': []
+}
 let visibleTaskUids = [];
 let routines = orgDataObj["routines"]
 
@@ -31,11 +37,25 @@ deleteTaskBtn.addEventListener("click", () => deleteTask());
 const newTaskBtn = document.getElementById("new-task-btn");
 newTaskBtn.addEventListener("click", () => newTask());
 
-const resourceTable = document.getElementById("filter-table-body");
+const manageRoutinesBtn = document.getElementById("manage-routines-btn");
+manageRoutinesBtn.addEventListener("click", () => manageRoutines());
+
+const filterBtn = document.getElementById("filter-btn");
+filterBtn.addEventListener('click', () => updateFilterDatatype());
+
+const filterTable = document.getElementById("filter-table-body");
 let filterDatatype
 
-let filterBtn = document.getElementById("filter-btn");
-filterBtn.addEventListener("click", () => filterTasks());
+const resetFilterBtn = document.getElementById('reset-filter-btn');
+resetFilterBtn.addEventListener('click', () => resetFilter());
+
+const routineTable = document.getElementById("routine-table-body")
+
+const newRoutineBtn = document.getElementById('new-routine-btn')
+newRoutineBtn.addEventListener('click', () => newRoutine())
+
+let filterDatatypeSelector = document.getElementById("filter-datatype-select");
+filterDatatypeSelector.addEventListener("change", () => updateFilterDatatype());
 
 let applyBtn = document.getElementById("apply-filter-btn");
 applyBtn.addEventListener("click", () => {applyFilter(filterDatatype);});
@@ -54,28 +74,22 @@ drawRoutine();
 drawLib.scrollToTopLeftTask();
 
 function loadRoutinesIntoSelector(routines) {
-    for (let i=0; i<routines.length; i++) {
+    routineSelector.innerHTML = ''
 
-        let routineUid = routines[i]["uid"];
-        let routineName = routines[i]["name"];
-
+    routines.forEach(routine => {
         let routineOption = elemBuild("option", "routine-opt");
-        routineOption.setAttribute("value", routineUid);
-        routineOption.innerHTML = routineName;
+        routineOption.setAttribute("value", routine['uid']);
+        routineOption.innerHTML = routine['name'];
 
         routineSelector.appendChild(routineOption);
-    }
-
-    // New Routine option
-    let newRoutineOption = elemBuild("option", "new-routine-opt", "new-routine-opt");
-    newRoutineOption.innerHTML = "New Routine";
-
-    routineSelector.appendChild(newRoutineOption);
+    })
 }
 
 function loadSelectorIntoModal(key) {
     let vals = orgDataObj[key.concat("s")];
     let selector = document.getElementById(key);
+
+    selector.innerHTML = '';
 
     vals.forEach(val => {
         let uidVal = val["uid"];
@@ -128,6 +142,7 @@ function loadResourcesIntoModal(resource, dataIdentifier, targetID=resource) {
     });
 }
 
+
 function createTagCell(tagArr) {
     let tdTagValue = ''
     let tdTags = elemBuild('td');
@@ -148,12 +163,12 @@ function createTagCell(tagArr) {
     return tdTags
 }
 
+
 // ROUTINE SELECTOR
 
 function drawRoutine() {
     let currRoutineUid = routineSelector.options[routineSelector.selectedIndex].value;
     let filterUids = getFilterUids();
-    console.log(filterUids)
     if ((filterUids.length === 0)) {
         visibleTaskUids = [];
         orgTasks.forEach( task => {
@@ -434,18 +449,63 @@ async function createNewTask() {
 
 // FILTER TASKS
 
-function loadFilterResources(filterDatatype) {
-    let lastResource = resourceTable.dataset.lastresource;
-    if ((filterDatatype !== lastResource) && (filterDatatype !== "not-selected")) {
-        console.log("change")
-        resourceTable.innerHTML = '';
+function updateFilterDatatype() {
+    let filterDatatypeSelector = document.getElementById("filter-datatype-select");
+    filterDatatype = filterDatatypeSelector.value;
 
-        let modalTitle = document.getElementById("filter-title");
-        modalTitle.innerHTML = `Filter taskboard by ${filterDatatype}`;
-
-        loadResourcesIntoModal(filterDatatype, "filteruid", "filter");
-        resourceTable.setAttribute("data-lastresource", filterDatatype);
+    if (filterDatatype !== 'not-selected') {
+        if (filterDatatype === 'locations') {
+            loadLocationsIntoModal();
+        }
+        else {
+            loadFilterResources(filterDatatype);
+        }
     }
+}
+
+function loadLocationsIntoModal() {
+    orgDataObj['locations'].forEach(location => {
+        let inputField = elemBuild("input", "form-check-input table-checkbox resource-checkbox");
+        inputField.setAttribute(`data-filteruid`, location['uid']);
+        inputField.setAttribute("type", "checkbox");
+
+        let th = elemBuild("th");
+        th.setAttribute("scope", "row");
+        th.appendChild(inputField);
+
+        let tdId = elemBuild('td');
+
+        let tdName = elemBuild('td');
+        tdName.setAttribute("value", location['uid']);
+        tdName.innerHTML = location['name'];
+
+        let tdTags = elemBuild('td');
+
+        let tr = elemBuild("tr", "resource-record");
+        tr.appendChild(th);
+        tr.appendChild(tdId);
+        tr.appendChild(tdName);
+        tr.appendChild(tdTags);
+
+        filterTable.appendChild(tr);
+    })
+}
+
+
+function loadFilterResources(filterDatatype) {
+    filterTable.innerHTML = ''
+    loadResourcesIntoModal(filterDatatype, "filteruid", "filter");
+
+    let tableCheckboxes = document.querySelectorAll("[data-filteruid]");
+
+    tableCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    })
+
+    filter[filterDatatype].forEach(uid => {
+        let trFilterRecord = document.querySelectorAll(`[data-filteruid="${uid}"]`)[0]
+        trFilterRecord.checked = true;
+    })
 }
 
 function getFilterUids() {
@@ -473,19 +533,125 @@ function findVisibleTasks(datatype, uids) {
             });
         });
     });
-    return visibleTaskUids
+    return visibleTaskUids;
 }
 
 
-
-function applyFilter(datatype){
+function applyFilter(datatype) {
     let uids = getFilterUids();
-    visibleTaskUids = findVisibleTasks(datatype, uids);
+    filter[datatype] = [];
+    uids.forEach(uid => {
+        filter[datatype].push(uid);
+    })
+
+    if (datatype === 'location') {
+
+    }
+    else {
+        visibleTaskUids = findVisibleTasks(datatype, filter[datatype]);
+    }
     drawRoutine();
 }
 
-function filterTasks() {
+function resetFilter() {
     let filterDatatypeSelector = document.getElementById("filter-datatype-select");
     filterDatatype = filterDatatypeSelector.value;
-    loadFilterResources(filterDatatype);
+
+    filter[filterDatatype] = [];
+    updateFilterDatatype();
+    applyFilter();
+}
+
+
+function manageRoutines() {
+    routineTable.innerHTML = '';
+
+    routines.forEach(routine => {
+        let tr = elemBuild('tr');
+
+        let tdName = elemBuild('td');
+        tdName.setAttribute("value", routine['uid']);
+        tdName.innerHTML = routine['name'];
+
+        let editBtn = elemBuild('button', 'btn btn-secondary edit-btn action-btn');
+        editBtn.setAttribute('data-routineuid', routine['uid'])
+        editBtn.addEventListener("click", () => editRoutine(routine));
+        editBtn.innerHTML = 'Edit'
+
+        let deleteBtn = elemBuild('button', 'btn btn-danger delete-btn action-btn');
+        deleteBtn.setAttribute('data-routineuid', routine['uid'])
+        deleteBtn.addEventListener("click", () => deleteRoutine(routine));
+        deleteBtn.innerHTML = 'Delete'
+
+        let tdActions = elemBuild('td', 'col-sm-3');
+        tdActions.appendChild(editBtn);
+        tdActions.appendChild(deleteBtn);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdActions);
+
+        routineTable.appendChild(tr);
+    })
+}
+
+async function newRoutine() {
+    let newRoutineName = prompt("New routine name:")
+    if (newRoutineName) {
+        let assignedUid = await apiCall("./post-new-routine", JSON.stringify(newRoutineName));
+        if (assignedUid) {
+            routines.push({
+                "uid": assignedUid,
+                "name": newRoutineName
+            });
+        }
+        else {
+            alert(errGet);
+        }
+        manageRoutines();
+    }
+}
+
+
+async function editRoutine(editingRoutine) {
+    let editedRoutineName = prompt(`Editing name of routine : "${editingRoutine['name']}"`)
+    if (editedRoutineName) {
+        let validation = await apiCall("./post-edited-routine", JSON.stringify({
+            "uid": editingRoutine['uid'],
+            "name": editedRoutineName
+        }), true);
+        if (validation) {
+            routines.forEach(routine => {
+                if (routine['uid'] === editingRoutine['uid']) {
+                    routine['name'] = editedRoutineName;
+                }
+            })
+        }
+        else {
+            alert(errGet);
+        }
+        manageRoutines();
+    }
+}
+
+
+async function deleteRoutine(deletingRoutine) {
+    let routineIndex
+    if (confirm(`Delete task "${deletingRoutine['name']}"?\nThis will also delete all tasks listed this routine.`)) {
+        let validation = await apiCall("./post-delete-routine", JSON.stringify(deletingRoutine['uid']), true);
+        if (validation) {
+            for (let i=0; i<routines.length; i++) {
+                if (routines[i]["uid"] === deletingRoutine['uid']) {
+                    routineIndex = i;
+                }
+            }
+            routines.splice(routineIndex, 1)
+        }
+        else {
+            alert(errGet);
+        }
+        manageRoutines();
+        loadRoutinesIntoSelector(routines);
+        loadSelectorIntoModal('routine');
+        drawRoutine();
+    }
 }
